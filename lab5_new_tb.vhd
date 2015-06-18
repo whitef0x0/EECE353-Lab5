@@ -145,10 +145,14 @@ begin
       assert colour_out = "000";
       wait until rising_edge(clk);
 			
-			for i in 19200 downto 2 loop
-				assert plot_out = '1';
-				assert colour_out = "000";
-				wait until rising_edge(clk);
+			for i_y in 0 to 119 loop
+				for i_x in 1 to 159 loop
+					assert plot_out = '1';
+					-- assert x_out = std_logic_vector(i_x);
+					-- assert y_out = std_logic_vector(i_y);
+					assert colour_out = "000";
+					wait until rising_edge(clk);
+				end loop;
 			end loop;
     end;
     
@@ -165,7 +169,7 @@ begin
 		
 	
 			--Draw top wall
-			for i in 155 downto 5 loop
+			for i in 5 to 154 loop
 				assert plot_out = '1';
 				-- assert x_out = std_logic_vector(i);
 				-- assert y_out = "0000101";
@@ -178,10 +182,15 @@ begin
 			assert y_out = "1110011";
 			
 			--Draw bottom wall
-			for i in 155 downto 5 loop
+			for i in 5 to 154 loop
 				assert plot_out = '1';
+				assert x_out = "00000101";
+				if(i >= 54 and i <= 66) then
+					assert colour_out = "001";
+				elsif(i >= 115) then
+					assert colour_out = "
 				-- assert x_out = std_logic_vector(i);
-				-- assert y_out = "0000101";
+				-- assert y_out = "1110011";
 				assert colour_out = "111";
 				wait until rising_edge(clk);
 			end loop;
@@ -190,12 +199,95 @@ begin
 
 begin
 
-		--Test #1: No Paddle Movement
+		--Test #1: Move All Paddles DOWN
 		
-		--Clear Screen Procedure
+		--Initialization Procedure
 		clear_screen();
+		draw_walls()
 		
-    test_sequence( input_sequence => "000", expected_output_sequence => "000");
+		
+		--TEST s1g STATE (DRAW PLYR1 GOALIE)
+			
+			--Initialize s1g state
+		p2_fwd <= '0';
+		p2_goalie <= '0';
+		p1_fwd <= '0';
+		p2_goalie <= '0';
+		
+		--Check to make sure we start drawing from (5,6)
+		assert y_out = "0000110";
+		assert x_out = "00000101";
+		assert colour = "000";
+		assert plot = '1';
+		wait until rising_edge(clk);
+		
+		--Run s1g state (DRAW PADDLE1)
+		for i in 115 downto 7 loop
+			assert plot = '1';
+			if(i >= 54 and y_tmp <= 66) then
+				--t1g = 54
+				assert colour = "001";
+      else 
+      	assert colour = "000";
+			end if;
+			
+			wait until rising_edge(clk);
+		end loop;
+		--t1g = 55
+
+    
+    --TEST s1f STATE (DRAW PLYR1 FWD)
+    assert x_tmp = "01000011";
+    assert y_out = "0000110";
+    assert colour = "000";
+    assert plot = '1';
+    wait until rising_edge(clk);
+
+		--RUN s1f STATE (DRAW PLYR1 FWD)
+		for i in 115 downto 7 loop
+			assert plot = '1';
+			if(i >= 54 and y_tmp <= 66) then
+				--t1f = 54
+				assert colour = "001";
+      else 
+      	assert colour = "000";
+			end if;
+			
+			wait until rising_edge(clk);
+		end loop;
+		--t1f = 55
+		
+		
+		--TEST s1f STATE (DRAW PLYR2 FWD)
+    assert x_tmp = "01000011";
+    assert y_out = "0000110";
+    assert colour = "000";
+    assert plot = '1';
+    wait until rising_edge(clk);
+
+		--RUN s1f STATE (DRAW PLYR1 FWD)
+		for i in 115 downto 7 loop
+			assert plot = '1';
+			if(i >= 54 and y_tmp <= 66) then
+				--t1f = 54
+				assert colour = "001";
+      else 
+      	assert colour = "000";
+			end if;
+			
+			wait until rising_edge(clk);
+		end loop;
+		--t1f = 55
+		
+		 --TEST s1f STATE (DRAW PLYR1 FWD)
+    assert x_tmp = "01000011";
+    assert y_out = "0000110";
+    assert colour = "000";
+    assert plot = '1';
+    wait until rising_edge(clk);
+
+		--RUN s1f STATE (DRAW PLYR1 FWD)
+    --test_sequence( input_sequence => "000", expected_output_sequence => "000");
 
 
     std.env.finish;
