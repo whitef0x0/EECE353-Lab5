@@ -12,7 +12,7 @@ entity lab5_new is
       colour_out            : out std_logic_vector(2 downto 0);
       x_out                 : out  std_logic_vector(7 downto 0);
       y_out                 : out  std_logic_vector(6 downto 0);
-      plot_out              : out  std_logic;
+      plot_out              : out  std_logic
       -- VGA_R, VGA_G, VGA_B  : out std_logic_vector(9 downto 0);  -- The outs go to VGA controller
       -- VGA_HS               : out std_logic;
       -- VGA_VS               : out std_logic;
