@@ -8,7 +8,7 @@ entity lab5_new is
   port(CLOCK_50             : in  std_logic;
       KEY                   : in  std_logic_vector(3 downto 0);
       SW                    : in  std_logic_vector(17 downto 0);
-      LEDG                  : out std_logic_vector(7 downto 0);
+      -- LEDG                  : out std_logic_vector(7 downto 0);
       colour_out            : out std_logic_vector(2 downto 0);
       x_out                 : out  std_logic_vector(7 downto 0);
       y_out                 : out  std_logic_vector(6 downto 0);
