@@ -77,6 +77,8 @@ architecture stimulus of lab5_new_tb is
 
     signal s_input_sequence : input_record_array;
     signal s_output_sequence : output_record_array;
+    
+    
 
 	--Declare a constant of type 'time'. This would be used to cause delay
   -- between clock edges
@@ -84,6 +86,19 @@ architecture stimulus of lab5_new_tb is
   --Period of 50MHz Clock
 	constant HALF_PERIOD : time := 10ns;
 
+	--Colour constants
+	constant WALL_COLOUR : std_logic_vector(2 downto 0) := "111";
+	constant BACKGROUND_COLOUR : std_logic_vector(2 downto 0) := "000";
+	constant P1_COLOUR : std_logic_vector(2 downto 0) := "001";
+	constant P2_COLOUR : std_logic_vector(2 downto 0) := "100";
+	
+	--Position constants
+	constant INIT_X_PUCK : std_logic_vector(7 downto 0) := "01010000"; --80
+	constant INIT_Y_PUCK : std_logic_vector(7 downto 0) := "0111100"; --60
+	
+	--constant INIT_X_DRAW : std_logic_vector(7 downto 0) := "00000101"; --5
+	--constant INIT_Y_DRAW : std_logic_vector(7 downto 0) := "0000101"; --5
+	
 begin
 
 	key <= resetb & "00" & "00" & "00";
@@ -109,6 +124,11 @@ begin
 	end process; 
 	
   main_test: process is
+    variable t1g, t1f, t2g, t2f: : unsigned(6 downto 0);
+		variable puckx : unsigned(7 downto 0) := INIT_X_PUCK; -- 80
+    variable pucky : unsigned(6 downto 0) := INIT_Y_PUCK; -- 60
+    variable velx : std_logic := '0';
+    variable vely : std_logic := '0';
 
     procedure test_sequence(
         input_sequence: input_record_array;
@@ -132,17 +152,13 @@ begin
 			wait until rising_edge(clk);
 			
 			--Clear Screen Initial State 
-			p2_fwd <= '0';
-			p2_goalie <= '0';
-			p1_fwd <= '0';
-			p2_goalie <= '0';
 			resetb <= '1';
 			wait until rising_edge(clk);
 			
 			assert x_out = "00000000";
       assert y_out = "0000000";
       assert plot_out = '1';
-      assert colour_out = "000";
+      assert colour_out = BACKGROUND_COLOUR;
       wait until rising_edge(clk);
 			
 			for i_y in 0 to 119 loop
@@ -161,7 +177,7 @@ begin
     
 			--Check we are starting in correct state
 			assert plot_out = '1';
-			assert colour_out = "111"; -- make sure colour of walls is white
+			assert colour_out = WALL_COLOUR; -- make sure colour of walls is white
 			
 			-- make sure we start at (5,5)
 			assert x_out = "00000101"; 
@@ -173,7 +189,7 @@ begin
 				assert plot_out = '1';
 				-- assert x_out = std_logic_vector(i);
 				-- assert y_out = "0000101";
-				assert colour_out = "111";
+				assert colour_out = WALL_COLOUR;
 				wait until rising_edge(clk);
 			end loop;
 			
@@ -186,12 +202,12 @@ begin
 				assert plot_out = '1';
 				assert x_out = "00000101";
 				if(i >= 54 and i <= 66) then
-					assert colour_out = "001";
+					assert colour_out = P1_COLOUR;
 				elsif(i >= 115) then
 					assert colour_out = "
 				-- assert x_out = std_logic_vector(i);
 				-- assert y_out = "1110011";
-				assert colour_out = "111";
+				assert colour_out = WALL_COLOUR;
 				wait until rising_edge(clk);
 			end loop;
     end;
@@ -199,94 +215,132 @@ begin
 
 begin
 
-		--Test #1: Move All Paddles DOWN
+--Test #1: Move All Paddles DOWN
 		
-		--Initialization Procedure
-		clear_screen();
-		draw_walls()
+	--Test 1 | STEP #1
 		
-		
-		--TEST s1g STATE (DRAW PLYR1 GOALIE)
-			
-			--Initialize s1g state
+    --Initialize inputs
 		p2_fwd <= '0';
 		p2_goalie <= '0';
 		p1_fwd <= '0';
 		p2_goalie <= '0';
 		
-		--Check to make sure we start drawing from (5,6)
-		assert y_out = "0000110";
-		assert x_out = "00000101";
-		assert colour = "000";
+		--Initialization Procedure
+		t1g := "0110110";
+    t1f := "0110110";
+    t2g := "0110110";
+    t2f := "0110110";
+    velx := p2_fwd xor p1_fwd;
+    velx := p2_goalie xor p1_goalie;
+    
+		clear_screen();
+		draw_walls();
+		
+		--Test 1 | STEP #2	
+		--test s1g state (DRAW PLYR1 GOALIE)
+			
+			--Start drawing from (5,6)
+		assert x_out = "00000101"; -- 5
+		assert y_out = "0000110"; -- 6
+		assert colour = BACKGROUND_COLOUR;
 		assert plot = '1';
 		wait until rising_edge(clk);
 		
-		--Run s1g state (DRAW PADDLE1)
-		for i in 115 downto 7 loop
+			--run s1g state (DRAW PLYR2 GOALIE)
+		for i in 7 to 115 loop
 			assert plot = '1';
-			if(i >= 54 and y_tmp <= 66) then
-				--t1g = 54
-				assert colour = "001";
+			if(i >= 54 and i <= 66) then
+				assert colour = P1_COLOUR;
+      elsif(i = 115) then
+				assert colour = WALL_COLOUR;
       else 
-      	assert colour = "000";
+      	assert colour = BACKGROUND_COLOUR;
 			end if;
 			
 			wait until rising_edge(clk);
 		end loop;
-		--t1g = 55
+		t1g := t1g + 1;
 
-    
-    --TEST s1f STATE (DRAW PLYR1 FWD)
-    assert x_tmp = "01000011";
-    assert y_out = "0000110";
-    assert colour = "000";
+  --Test 1 | STEP #3  
+    --test s1f state (DRAW PLYR1 FWD)
+    assert x_out = "01000011"; -- 67
+    assert y_out = "0000110"; -- 6
+    assert colour = BACKGROUND_COLOUR;
     assert plot = '1';
     wait until rising_edge(clk);
 
-		--RUN s1f STATE (DRAW PLYR1 FWD)
-		for i in 115 downto 7 loop
+		--run s1f state (DRAW PLYR1 FWD)
+		for i in 7 to 115 loop
 			assert plot = '1';
-			if(i >= 54 and y_tmp <= 66) then
-				--t1f = 54
-				assert colour = "001";
+			if(i >= 54 and i <= 66) then
+				assert colour = P1_COLOUR;
+      elsif(i = 115) then
+				assert colour = WALL_COLOUR;
       else 
-      	assert colour = "000";
+      	assert colour = BACKGROUND_COLOUR;
 			end if;
 			
 			wait until rising_edge(clk);
 		end loop;
-		--t1f = 55
+		t1f := t1f + 1;
 		
-		
-		--TEST s1f STATE (DRAW PLYR2 FWD)
-    assert x_tmp = "01000011";
-    assert y_out = "0000110";
-    assert colour = "000";
+	--Test 1 | STEP #4
+		--test s2g state (DRAW PLYR2 GOALIE)
+    assert x_out = "10011010"; -- 154
+    assert y_out = "0000110"; -- 6
+    assert colour = BACKGROUND_COLOUR;
     assert plot = '1';
     wait until rising_edge(clk);
 
-		--RUN s1f STATE (DRAW PLYR1 FWD)
-		for i in 115 downto 7 loop
+			--run s2g state (DRAW PLYR2 GOALIE)
+		for i in 7 to 115 loop
 			assert plot = '1';
-			if(i >= 54 and y_tmp <= 66) then
-				--t1f = 54
-				assert colour = "001";
+			if(i >= 54 and i <= 66) then
+				assert colour = P2_COLOUR;
+			elsif(i = 115) then
+				assert colour = WALL_COLOUR;
       else 
-      	assert colour = "000";
+      	assert colour = BACKGROUND_COLOUR;
 			end if;
 			
 			wait until rising_edge(clk);
 		end loop;
-		--t1f = 55
+		t2g := t2g + 1;
 		
-		 --TEST s1f STATE (DRAW PLYR1 FWD)
-    assert x_tmp = "01000011";
-    assert y_out = "0000110";
-    assert colour = "000";
+	--Test 1 | STEP #5	
+		--test s2f state (DRAW PLYR2 FWD)
+    assert x_out = "01011101"; -- 93
+    assert y_out = "0000110"; -- 6
+    assert colour = BACKGROUND_COLOUR;
     assert plot = '1';
     wait until rising_edge(clk);
 
-		--RUN s1f STATE (DRAW PLYR1 FWD)
+			--run s2g state (DRAW PLYR2 GOALIE)
+		for i in 7 to 115 loop
+			assert plot = '1';
+			if(i >= 54 and i <= 66) then
+				assert colour = P2_COLOUR;
+      elsif(i = 115) then
+				assert colour = WALL_COLOUR;
+      else 
+      	assert colour = BACKGROUND_COLOUR;
+			end if;
+			
+			wait until rising_edge(clk);
+		end loop;
+		t2f := t2f + 1;
+		
+	--Test 1 | STEP #6	
+		--test sgp1 state (INIT PUCK)
+		assert plot = '1';
+    assert colour = BACKGROUND_COLOUR;
+    assert x = INIT_X_PUCK; -- 80
+    assert y = INIT_Y_PUCK; -- 60
+    wait until rising_edge(clk);
+  
+  --Test 1 | STEP #7
+		--test sgp2 state (PUCK COLLISION and PUCK DRAW)
+		for i in 
     --test_sequence( input_sequence => "000", expected_output_sequence => "000");
 
 
