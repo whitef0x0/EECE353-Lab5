@@ -82,7 +82,7 @@ architecture stimulus of lab5_new_tb is
   -- between clock edges
 
   --Period of 50MHz Clock
-	constant PERIOD : time := 20ns;
+	constant HALF_PERIOD : time := 10ns;
 
 begin
 
@@ -90,7 +90,7 @@ begin
 	sw <= p2_fwd & p2_goalie & "0000 0000 0000 00" & p2_fwd & p2_goalie;
 
 	DUT: lab5_new 
-	  port map (
+		port map (
       CLOCK_50 => clk,
       key => key,
       sw => sw,
@@ -101,26 +101,102 @@ begin
       plot_out => plot_out
     );
   
-  
-  main_test_process: process is
+  -- CLOCK STIMULI
+	CLOCK: process
+	begin
+		CLK <= not clk after HALF_PERIOD ns;
+		wait for 2*HALF_PERIOD ns;
+	end process; 
+	
+  main_test: process is
 
     procedure test_sequence(
-        input_sequence: std_logic_vector;
-        expected_output_sequence: std_logic_vector
+        input_sequence: input_record_array;
+        expected_output_sequence: output_record_array
     ) is begin
         for i in input_sequence'range loop
             x <= input_sequence(i);
             wait until rising_edge(clk);
-            assert z = expected_output_sequence(i);
+            assert colour_out = expected_output_sequence(i).colour;
+            --assert x_out = expected_output_sequence(i).x;
+            --assert y_out = expected_output_sequence(i).y;
+            assert plot_out = expected_output_sequence(i).plot;
         end loop;
     end;
+    
+    procedure clear_screen() is 
+    begin
+    
+			--Press Reset
+			resetb <= '0';
+			wait until rising_edge(clk);
+			
+			--Clear Screen Initial State 
+			p2_fwd <= '0';
+			p2_goalie <= '0';
+			p1_fwd <= '0';
+			p2_goalie <= '0';
+			resetb <= '1';
+			wait until rising_edge(clk);
+			
+			assert x_out = "00000000";
+      assert y_out = "0000000";
+      assert plot_out = '1';
+      assert colour_out = "000";
+      wait until rising_edge(clk);
+			
+			for i in 19200 downto 2 loop
+				assert plot_out = '1';
+				assert colour_out = "000";
+				wait until rising_edge(clk);
+			end loop;
+    end;
+    
+    procedure draw_walls() is 
+    begin
+    
+			--Check we are starting in correct state
+			assert plot_out = '1';
+			assert colour_out = "111"; -- make sure colour of walls is white
+			
+			-- make sure we start at (5,5)
+			assert x_out = "00000101"; 
+			assert y_out = "0000101";
+		
+	
+			--Draw top wall
+			for i in 155 downto 5 loop
+				assert plot_out = '1';
+				-- assert x_out = std_logic_vector(i);
+				-- assert y_out = "0000101";
+				assert colour_out = "111";
+				wait until rising_edge(clk);
+			end loop;
+			
+			-- make sure we start at (5,155)
+			assert x_out = "00000101"; 
+			assert y_out = "1110011";
+			
+			--Draw bottom wall
+			for i in 155 downto 5 loop
+				assert plot_out = '1';
+				-- assert x_out = std_logic_vector(i);
+				-- assert y_out = "0000101";
+				assert colour_out = "111";
+				wait until rising_edge(clk);
+			end loop;
+    end;
+    	
 
 begin
 
+		--Test #1: No Paddle Movement
+		
+		--Clear Screen Procedure
+		clear_screen();
+		
     test_sequence( input_sequence => "000", expected_output_sequence => "000");
-    test_sequence( input_sequence => "001", expected_output_sequence => "000");
-    --  (add any other input sequences here...)
-    test_sequence( input_sequence => "110", expected_output_sequence => "001");
+
 
     std.env.finish;
 
