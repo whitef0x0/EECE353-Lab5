@@ -333,7 +333,7 @@ begin
                         elsif (max_clk >= 700000) then
                             max_clk := max_clk - 100;
                         end if;
-                        ledg <= std_logic_vector(max_clk(21 downto 14));
+                        -- ledg <= std_logic_vector(max_clk(21 downto 14));
                         
                         --Redraw paddles
                         y_tmp := "0000101"; --set y to 5
