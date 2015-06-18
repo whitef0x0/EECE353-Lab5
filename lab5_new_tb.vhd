@@ -59,7 +59,6 @@ architecture stimulus of lab5_new_tb is
     --Records/Arrays for testing
     type record_name is
       output_record
-        -- led : std_logic_vector(7 downto 0);
         colour : std_logic_vector(2 downto 0);
         x : std_logic_vector(7 downto 0);
         y : std_logic_vector(6 downto 0);
