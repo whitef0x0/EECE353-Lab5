@@ -90,8 +90,11 @@ begin
                     y_tmp := "0000000";
                     puckx := "01010000";
                     pucky := "0111100";
+                    
+                    --THIS ISN'T CORRECT WAY TO INITIALIZE OUR VELOCITY
                     velx := sw(17) xor sw(0);
                     vely := sw(16) xor sw(1);
+                    
                     max_clk := (others => '1');
                     state := sb;
                 when sb =>
@@ -231,11 +234,14 @@ begin
                     state := sgp2;
                 when sgp2 =>
                     --collision detection with walls
+                    --DOESN'T SEEM TO INVERT ANY VELOCITY
                     if (puckx <= 4) then
                         state := sr;
                     elsif (puckx >= 156) then
                         state := sr;
                     else
+                    
+                        --ONLY INVERTS Y VELOCITY, AND NOT THE X VELOCITY when hitting
                         if (pucky <= 6) then
                             vely := '1';
                         elsif (pucky >= 114) then
@@ -254,6 +260,7 @@ begin
                         end if;
                         
                         --collision detection with paddles
+                        --ONLY INVERTS X VELOCITY, NOT THE Y VELOCITY when hitting
                         if (puckx = "00000101" and pucky >= t1g and pucky <= t1g+12) then
                             velx := not velx;
                             if (velx = '0') then
