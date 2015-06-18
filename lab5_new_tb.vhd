@@ -57,25 +57,25 @@ architecture stimulus of lab5_new_tb is
     signal p2_fwd : std_logic := '0';
         	
     --Records/Arrays for testing
-    type record_name is
-      output_record
-        colour : std_logic_vector(2 downto 0);
-        x : std_logic_vector(7 downto 0);
-        y : std_logic_vector(6 downto 0);
-        plot :  std_logic;
-      end record;
+    --type record_name is
+    --  output_record
+    --    colour : std_logic_vector(2 downto 0);
+    --    x : std_logic_vector(7 downto 0);
+    --    y : std_logic_vector(6 downto 0);
+    --    plot :  std_logic;
+    --  end record;
     
-    type record_name is
-      input_record
-        key : in  std_logic_vector(3 downto 0);
-        sw  : in  std_logic_vector(17 downto 0);
-      end record;
+    --type record_name is
+    --  input_record
+    --    key : in  std_logic_vector(3 downto 0);
+    --    sw  : in  std_logic_vector(17 downto 0);
+    --  end record;
     
-    type input_record_array is array (0 to 10) of input_record; 
-    type output_record_array is array (0 to 10) of output_record; 
+    --type input_record_array is array (0 to 10) of input_record; 
+    --type output_record_array is array (0 to 10) of output_record; 
 
-    signal s_input_sequence : input_record_array;
-    signal s_output_sequence : output_record_array;
+    --signal s_input_sequence : input_record_array;
+    --signal s_output_sequence : output_record_array;
     
     
 
