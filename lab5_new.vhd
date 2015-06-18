@@ -23,18 +23,18 @@ end lab5_new;
 
 architecture RTL of lab5_new is
 
-    component vga_adapter
-        generic(RESOLUTION : string);
-        port(
-            resetn                                          : in std_logic;
-            clock                                           : in std_logic;
-            colour                                          : in std_logic_vector(2 downto 0);
-            x                                               : in  std_logic_vector(7 downto 0);
-            y                                               : in  std_logic_vector(6 downto 0);
-            plot                                            : in  std_logic;
-            VGA_R, VGA_G, VGA_B                             : out std_logic_vector(9 downto 0);
-            VGA_HS, VGA_VS, VGA_BLANK, VGA_SYNC, VGA_CLK    : out std_logic);
-    end component;
+    -- component vga_adapter
+    --     generic(RESOLUTION : string);
+    --     port(
+    --         resetn                                          : in std_logic;
+    --         clock                                           : in std_logic;
+    --         colour                                          : in std_logic_vector(2 downto 0);
+    --         x                                               : in  std_logic_vector(7 downto 0);
+    --         y                                               : in  std_logic_vector(6 downto 0);
+    --         plot                                            : in  std_logic;
+    --         VGA_R, VGA_G, VGA_B                             : out std_logic_vector(9 downto 0);
+    --         VGA_HS, VGA_VS, VGA_BLANK, VGA_SYNC, VGA_CLK    : out std_logic);
+    -- end component;
             
             
     signal x        : std_logic_vector(7 downto 0) := "00000000";
