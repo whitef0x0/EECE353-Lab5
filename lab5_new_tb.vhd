@@ -24,7 +24,7 @@ architecture stimulus of lab5_new_tb is
 	  port(CLOCK_50          : in  std_logic;
       KEY                  : in  std_logic_vector(3 downto 0);
       SW                   : in  std_logic_vector(17 downto 0);
-      LEDG                 : out std_logic_vector(7 downto 0);
+      --LEDG                 : out std_logic_vector(7 downto 0);
       colour_out            : out std_logic_vector(2 downto 0);
       x_out                 : out  std_logic_vector(7 downto 0);
       y_out                 : out  std_logic_vector(6 downto 0);
@@ -40,7 +40,7 @@ architecture stimulus of lab5_new_tb is
     signal clk: std_logic := '0';
     signal key : std_logic_vector(3 downto 0);
     signal sw : std_logic_vector(8 downto 0);
-    signal led_out : std_logic_vector(7 downto 0);
+    -- signal led_out : std_logic_vector(7 downto 0);
     signal colour_out : std_logic_vector(2 downto 0);
     signal x_out : std_logic_vector(7 downto 0);
     signal y_out : std_logic_vector(6 downto 0);
@@ -59,7 +59,7 @@ architecture stimulus of lab5_new_tb is
     --Records/Arrays for testing
     type record_name is
       output_record
-        led : std_logic_vector(7 downto 0);
+        -- led : std_logic_vector(7 downto 0);
         colour : std_logic_vector(2 downto 0);
         x : std_logic_vector(7 downto 0);
         y : std_logic_vector(6 downto 0);
@@ -109,7 +109,7 @@ begin
       CLOCK_50 => clk,
       key => key,
       sw => sw,
-      ledg => out_led,
+      -- ledg => out_led,
       colour_out => colour_out,
       x_out x_out,
       y_out => y_out,
