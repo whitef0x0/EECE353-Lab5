@@ -63,7 +63,7 @@ architecture stimulus of lab5_new_tb is
         colour : std_logic_vector(2 downto 0);
         x : std_logic_vector(7 downto 0);
         y : std_logic_vector(6 downto 0);
-        plot : =  std_logic;
+        plot :  std_logic;
       end record;
     
     type record_name is
