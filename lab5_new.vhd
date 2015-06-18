@@ -6,15 +6,19 @@ use ieee.numeric_std.all;
 
 entity lab5_new is
   port(CLOCK_50             : in  std_logic;
-       KEY                  : in  std_logic_vector(3 downto 0);
-       SW                   : in  std_logic_vector(17 downto 0);
-       LEDG                 : out std_logic_vector(7 downto 0);
-       VGA_R, VGA_G, VGA_B  : out std_logic_vector(9 downto 0);  -- The outs go to VGA controller
-       VGA_HS               : out std_logic;
-       VGA_VS               : out std_logic;
-       VGA_BLANK            : out std_logic;
-       VGA_SYNC             : out std_logic;
-       VGA_CLK              : out std_logic);
+      KEY                   : in  std_logic_vector(3 downto 0);
+      SW                    : in  std_logic_vector(17 downto 0);
+      LEDG                  : out std_logic_vector(7 downto 0);
+      colour_out            : out std_logic_vector(2 downto 0);
+      x_out                 : out  std_logic_vector(7 downto 0);
+      y_out                 : out  std_logic_vector(6 downto 0);
+      plot_out              : out  std_logic;
+      -- VGA_R, VGA_G, VGA_B  : out std_logic_vector(9 downto 0);  -- The outs go to VGA controller
+      -- VGA_HS               : out std_logic;
+      -- VGA_VS               : out std_logic;
+      -- VGA_BLANK            : out std_logic;
+      -- VGA_SYNC             : out std_logic;
+      -- VGA_CLK              : out std_logic);
 end lab5_new;
 
 architecture RTL of lab5_new is
@@ -40,23 +44,27 @@ architecture RTL of lab5_new is
             
 begin
 
-    vga_u0 : vga_adapter
-        generic map(RESOLUTION => "160x120")
-        port map(resetn     => KEY(3),
-                clock       => CLOCK_50,
-                colour      => colour,
-                x           => x,
-                y           => y,
-                plot        => plot,
-                VGA_R       => VGA_R,
-                VGA_G       => VGA_G,
-                VGA_B       => VGA_B,
-                VGA_HS      => VGA_HS,
-                VGA_VS      => VGA_VS,
-                VGA_BLANK   => VGA_BLANK,
-                VGA_SYNC    => VGA_SYNC,
-                VGA_CLK     => VGA_CLK);
-
+    -- vga_u0 : vga_adapter
+    --     generic map(RESOLUTION => "160x120")
+    --     port map(resetn     => KEY(3),
+    --             clock       => CLOCK_50,
+    --             colour      => colour,
+    --             x           => x,
+    --             y           => y,
+    --             plot        => plot,
+    --             VGA_R       => VGA_R,
+    --             VGA_G       => VGA_G,
+    --             VGA_B       => VGA_B,
+    --             VGA_HS      => VGA_HS,
+    --             VGA_VS      => VGA_VS,
+    --             VGA_BLANK   => VGA_BLANK,
+    --             VGA_SYNC    => VGA_SYNC,
+    --             VGA_CLK     => VGA_CLK);
+    
+    x_out <= x;
+    y_out <= y;
+    plot_out <= plot;
+    colour_out <= colour;
 
     process(CLOCK_50, KEY(3))
         type state_types is (sr, sb, sginit, sg1g, sg1f, sg2g, sg2f, sgp1, sgp2, sgpause, sgdone);
