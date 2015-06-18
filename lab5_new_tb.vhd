@@ -46,7 +46,7 @@ architecture stimulus of lab5_new_tb is
     signal y_out : std_logic_vector(6 downto 0);
     signal plot_out : std_logic
     
-    --Middleware Signals
+    --Component Signals
       --KEY Signals
     signal resetb : std_logic := '1';
     
@@ -130,29 +130,23 @@ begin
     variable velx : std_logic := '0';
     variable vely : std_logic := '0';
 
-    procedure test_sequence(
-        input_sequence: input_record_array;
-        expected_output_sequence: output_record_array
-    ) is begin
-        for i in input_sequence'range loop
-            x <= input_sequence(i);
-            wait until rising_edge(clk);
-            assert colour_out = expected_output_sequence(i).colour;
-            --assert x_out = expected_output_sequence(i).x;
-            --assert y_out = expected_output_sequence(i).y;
-            assert plot_out = expected_output_sequence(i).plot;
-        end loop;
-    end;
+    -- procedure test_sequence(
+    --     input_sequence: input_record_array;
+    --     expected_output_sequence: output_record_array
+    -- ) is begin
+    --     for i in input_sequence'range loop
+    --         x <= input_sequence(i);
+    --         wait until rising_edge(clk);
+    --         assert colour_out = expected_output_sequence(i).colour;
+    --         --assert x_out = expected_output_sequence(i).x;
+    --         --assert y_out = expected_output_sequence(i).y;
+    --         assert plot_out = expected_output_sequence(i).plot;
+    --     end loop;
+    -- end;
     
     procedure clear_screen() is 
     begin
-    
-			--Press Reset
-			resetb <= '0';
-			wait until rising_edge(clk);
-			
-			--Clear Screen Initial State 
-			resetb <= '1';
+
 			wait until rising_edge(clk);
 			
 			assert x_out = "00000000";
@@ -211,8 +205,111 @@ begin
 				wait until rising_edge(clk);
 			end loop;
     end;
-    	
-
+   
+		procedure draw_paddles() is 
+    begin
+	  --STEP #1	
+			--test s1g state (DRAW PLYR1 GOALIE)
+				
+				--Start drawing from (5,6)
+			assert x_out = "00000101"; -- 5
+			assert y_out = "0000110"; -- 6
+			assert colour_out = BACKGROUND_COLOUR;
+			assert plot_out = '1';
+			wait until rising_edge(clk);
+			
+				--run s1g state (DRAW PLYR2 GOALIE)
+			for i in 7 to 115 loop
+				assert plot_out = '1';
+				if(i >= 54 and i <= 66) then
+					assert colour_out = P1_COLOUR;
+	      elsif(i = 115) then
+					assert colour_out = WALL_COLOUR;
+	      else 
+	      	assert colour_out = BACKGROUND_COLOUR;
+				end if;
+				
+				wait until rising_edge(clk);
+			end loop;
+			t1g := t1g + 1;
+	
+	  --STEP #2
+	    --test s1f state (DRAW PLYR1 FWD)
+	    assert x_out = "01000011"; -- 67
+	    assert y_out = "0000110"; -- 6
+	    assert colour_out = BACKGROUND_COLOUR;
+	    assert plot_out = '1';
+	    wait until rising_edge(clk);
+	
+			--run s1f state (DRAW PLYR1 FWD)
+			for i in 7 to 115 loop
+				assert plot_out = '1';
+				if(i >= 54 and i <= 66) then
+					assert colour_out = P1_COLOUR;
+	      elsif(i = 115) then
+					assert colour_out = WALL_COLOUR;
+	      else 
+	      	assert colour_out = BACKGROUND_COLOUR;
+				end if;
+				
+				wait until rising_edge(clk);
+			end loop;
+			t1f := t1f + 1;
+			
+		--STEP #3
+			--test s2g state (DRAW PLYR2 GOALIE)
+	    assert x_out = "10011010"; -- 154
+	    assert y_out = "0000110"; -- 6
+	    assert colour_out = BACKGROUND_COLOUR;
+	    assert plot_out = '1';
+	    wait until rising_edge(clk);
+	
+				--run s2g state (DRAW PLYR2 GOALIE)
+			for i in 7 to 115 loop
+				assert plot_out = '1';
+				if(i >= 54 and i <= 66) then
+					assert colour_out = P2_COLOUR;
+				elsif(i = 115) then
+					assert colour_out = WALL_COLOUR;
+	      else 
+	      	assert colour_out = BACKGROUND_COLOUR;
+				end if;
+				
+				wait until rising_edge(clk);
+			end loop;
+			t2g := t2g + 1;
+			
+		--STEP #4
+			--test s2f state (DRAW PLYR2 FWD)
+	    assert x_out = "01011101"; -- 93
+	    assert y_out = "0000110"; -- 6
+	    assert colour_out = BACKGROUND_COLOUR;
+	    assert plot_out = '1';
+	    wait until rising_edge(clk);
+	
+				--run s2g state (DRAW PLYR2 GOALIE)
+			for i in 7 to 115 loop
+				assert plot_out = '1';
+				if(i >= 54 and i <= 66) then
+					assert colour_out = P2_COLOUR;
+	      elsif(i = 115) then
+					assert colour_out = WALL_COLOUR;
+	      else 
+	      	assert colour_out = BACKGROUND_COLOUR;
+				end if;
+				
+				wait until rising_edge(clk);
+			end loop;
+			t2f := t2f + 1;
+			
+		--STEP #5
+			--test sgp1 state (INIT PUCK)
+			assert plot_out = '1';
+	    assert colour_out = BACKGROUND_COLOUR;
+	    assert x = INIT_X_PUCK; -- 80
+	    assert y = INIT_Y_PUCK; -- 60
+	    wait until rising_edge(clk);
+	end;
 begin
 
 --Test #1: Move All Paddles DOWN
@@ -233,116 +330,91 @@ begin
     velx := p2_fwd xor p1_fwd;
     velx := p2_goalie xor p1_goalie;
     
+    
+        
+		--Press Reset
+		resetb <= '0';
+		wait until rising_edge(clk);
+		
+		--Clear Screen Initial State 
+		resetb <= '1';
 		clear_screen();
 		draw_walls();
 		
-		--Test 1 | STEP #2	
-		--test s1g state (DRAW PLYR1 GOALIE)
+
+  
+  --Test 1 | STEP #1
+		--test sgp2 state (PUCK COLLISION and PUCK DRAW)
+		
+		
+		-- PUCK will move on UPWARD-LEFT trajectory till (26, 6) 
+		for i in 0 to 53 loop
+		
+			--Draw ball
+			assert plot_out = '1';
+			assert colour_out = WALL_COLOUR;
+			assert x = puckx;
+			assert y = pucky;
+			puckx := puckx - 1;
+			pucky := pucky - 1;
+			wait until rising_edge(clk);
 			
-			--Start drawing from (5,6)
-		assert x_out = "00000101"; -- 5
-		assert y_out = "0000110"; -- 6
-		assert colour = BACKGROUND_COLOUR;
-		assert plot = '1';
+			--Wait until paddle have been updated
+			assert plot_out = '0';
+			wait until plot_out = '1';
+			
+			--Wait until paddles have been fully drawn
+			for b in 0 to 440 loop
+				assert plot_out = '1';
+				wait until rising_edge(clk);
+			end loop;
+			
+		end loop;
+		
+		
+		-- PUCK hits TOP wall and bounces off DOWNWARD-LEFT  after (26, 6) 
+		assert y = "0000101"; -- 5
+		assert x = "00011011"; -- 25
+		puckx := puckx - 1;
+		pucky := pucky + 1;
+		vely := '1';
 		wait until rising_edge(clk);
 		
-			--run s1g state (DRAW PLYR2 GOALIE)
-		for i in 7 to 115 loop
-			assert plot = '1';
-			if(i >= 54 and i <= 66) then
-				assert colour = P1_COLOUR;
-      elsif(i = 115) then
-				assert colour = WALL_COLOUR;
-      else 
-      	assert colour = BACKGROUND_COLOUR;
-			end if;
-			
+		-- PUCK will move on a DOWNWARD-LEFT trajectory till (4, 28) 
+		for i in 0 to 21 loop
+			assert colour_out = WALL_COLOUR;
+			puckx := puckx - 1;
+			pucky := pucky + 1;
 			wait until rising_edge(clk);
-		end loop;
-		t1g := t1g + 1;
-
-  --Test 1 | STEP #3  
-    --test s1f state (DRAW PLYR1 FWD)
-    assert x_out = "01000011"; -- 67
-    assert y_out = "0000110"; -- 6
-    assert colour = BACKGROUND_COLOUR;
-    assert plot = '1';
-    wait until rising_edge(clk);
-
-		--run s1f state (DRAW PLYR1 FWD)
-		for i in 7 to 115 loop
-			assert plot = '1';
-			if(i >= 54 and i <= 66) then
-				assert colour = P1_COLOUR;
-      elsif(i = 115) then
-				assert colour = WALL_COLOUR;
-      else 
-      	assert colour = BACKGROUND_COLOUR;
-			end if;
 			
-			wait until rising_edge(clk);
+			--Wait until paddle have been updated
+			assert plot_out = '0';
+			wait until plot_out = '1';
+			
+			--Wait until paddles have been fully drawn
+			for b in 0 to 440 loop
+				assert plot_out = '1';
+				wait until rising_edge(clk);
+			end loop;
 		end loop;
-		t1f := t1f + 1;
 		
-	--Test 1 | STEP #4
-		--test s2g state (DRAW PLYR2 GOALIE)
-    assert x_out = "10011010"; -- 154
-    assert y_out = "0000110"; -- 6
-    assert colour = BACKGROUND_COLOUR;
-    assert plot = '1';
-    wait until rising_edge(clk);
-
-			--run s2g state (DRAW PLYR2 GOALIE)
-		for i in 7 to 115 loop
-			assert plot = '1';
-			if(i >= 54 and i <= 66) then
-				assert colour = P2_COLOUR;
-			elsif(i = 115) then
-				assert colour = WALL_COLOUR;
-      else 
-      	assert colour = BACKGROUND_COLOUR;
-			end if;
-			
-			wait until rising_edge(clk);
-		end loop;
-		t2g := t2g + 1;
 		
-	--Test 1 | STEP #5	
-		--test s2f state (DRAW PLYR2 FWD)
-    assert x_out = "01011101"; -- 93
-    assert y_out = "0000110"; -- 6
-    assert colour = BACKGROUND_COLOUR;
-    assert plot = '1';
-    wait until rising_edge(clk);
-
-			--run s2g state (DRAW PLYR2 GOALIE)
-		for i in 7 to 115 loop
-			assert plot = '1';
-			if(i >= 54 and i <= 66) then
-				assert colour = P2_COLOUR;
-      elsif(i = 115) then
-				assert colour = WALL_COLOUR;
-      else 
-      	assert colour = BACKGROUND_COLOUR;
-			end if;
-			
-			wait until rising_edge(clk);
-		end loop;
-		t2f := t2f + 1;
+		-- PUCK hit RIGHT WALL and bounces off DOWNWARD-RIGHT after (4, 28) 
+		-- Player2 scores a point and game resets
+		assert y = "0000101"; -- 5
+		assert x = "00011011"; -- 25
+		puckx := puckx + 1;
+		pucky := pucky + 1;
+		vely := '1';
+		wait until rising_edge(clk);
 		
-	--Test 1 | STEP #6	
-		--test sgp1 state (INIT PUCK)
-		assert plot = '1';
-    assert colour = BACKGROUND_COLOUR;
-    assert x = INIT_X_PUCK; -- 80
-    assert y = INIT_Y_PUCK; -- 60
-    wait until rising_edge(clk);
-  
-  --Test 1 | STEP #7
-		--test sgp2 state (PUCK COLLISION and PUCK DRAW)
-		for i in 
-    --test_sequence( input_sequence => "000", expected_output_sequence => "000");
-
+		-- PUCK will be reset to (80,60)
+		clear_screen();
+		draw_walls();
+		draw_paddles();
+		assert x = INIT_X_PUCK; -- 80
+	  assert y = INIT_Y_PUCK; -- 60
+		
 
     std.env.finish;
 
