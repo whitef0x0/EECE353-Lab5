@@ -234,16 +234,23 @@ begin
                     state := sgp2;
                 when sgp2 =>
                     --collision detection with walls
-                    --DOESN'T SEEM TO INVERT ANY VELOCITY
+                    
+                    --DOESN'T SEEM TO INVERT X VELOCITY
+                    --ONLY REFRESHES WHEN BALL COLLIDES WITH LEFT OR RIGHT WALL
+                    --Checks collision with LEFT wall
                     if (puckx <= 4) then
                         state := sr;
+                        --velx: '1';
+                    --Checks collision with RIGHT wall
                     elsif (puckx >= 156) then
                         state := sr;
+                        --velx: '1';
                     else
                     
-                        --ONLY INVERTS Y VELOCITY, AND NOT THE X VELOCITY when hitting
+                        --Checks collision with TOP wall
                         if (pucky <= 6) then
                             vely := '1';
+                        --Checks collision with BOTTOM wall
                         elsif (pucky >= 114) then
                             vely := '0';
                         end if;
@@ -264,6 +271,8 @@ begin
                         if (puckx = "00000101" and pucky >= t1g and pucky <= t1g+12) then
                             velx := not velx;
                             if (velx = '0') then
+                            
+                                --Why is it going by increments of '2' and not of '1'?
                                 puckx := puckx - 2;
                             else
                                 puckx := puckx + 2;
@@ -295,12 +304,25 @@ begin
                         colour <= "111";
                         y <= std_logic_vector(pucky);
                         x <= std_logic_vector(puckx);
+                        
+                        --Go to pause state
                         state := sgpause;
                     end if;
+                    
+                --Handles updating all game sprites
                 when sgpause =>
                     plot <= '0';
                     clk := clk + 1;
+                    --initial max_clk is 4194303
+                    
+                    --Slow down the clock with a counter (from 50MHz)
+                    
+                    --Refresh screen every 12Hz, 25Hz, 55Hz or 71Hz
+                    
+                    --First refresh will be 12Hz
+                    --Every other refresh (until initialization) will decrease by 2ms until it reaches 71Hz
                     if (clk = max_clk) then
+                        --reset clk counter to 0
                         clk := "0000000000000000000000";
                         if (max_clk >= 4000000) then
                             max_clk := max_clk - 100000;
@@ -312,7 +334,9 @@ begin
                             max_clk := max_clk - 100;
                         end if;
                         ledg <= std_logic_vector(max_clk(21 downto 14));
-                        y_tmp := "0000101";
+                        
+                        --Redraw paddles
+                        y_tmp := "0000101"; --set y to 5
                         colour <= "111";
                         state := sg1g;
                     end if;
