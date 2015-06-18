@@ -92,8 +92,11 @@ begin
                     pucky := "0111100";
                     
                     --THIS ISN'T CORRECT WAY TO INITIALIZE OUR VELOCITY
-                    velx := sw(17) xor sw(0);
-                    vely := sw(16) xor sw(1);
+                    -- velx := sw(17) xor sw(0);
+                    -- vely := sw(16) xor sw(1);
+                    
+                    velx := '1';
+                    vely := '0';
                     
                     max_clk := (others => '1');
                     state := sb;
