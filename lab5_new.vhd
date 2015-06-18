@@ -71,13 +71,20 @@ begin
         variable state : state_types := sr;
         variable clk : unsigned(21 downto 0) := "0000000000000000000000";
         variable max_clk : unsigned(21 downto 0) := "1111111111111111111111";
+        
+        
         variable x_tmp : unsigned(7 downto 0) := "00000000";
         variable y_tmp : unsigned(6 downto 0) := "0000000";
         variable t1g, t1f, t2g, t2f : unsigned(6 downto 0);
         variable puckx : unsigned(7 downto 0) := "01010000";
         variable pucky : unsigned(6 downto 0) := "0111100";
-        variable velx : std_logic := '0';
-        variable vely : std_logic := '0';
+        
+        variable error : signed(5 downto 0) := "000000";
+        variable e2 : signed(6 downto 0) :=    "0000000";
+        
+        type milli_int is IS INTEGER RANGE -10 TO 10;
+        variable velx : milli_int := 0;
+        variable vely : milli_int := 0;
     begin
         if (KEY(3) = '0') then
             state := sr;
@@ -95,8 +102,8 @@ begin
                     -- velx := sw(17) xor sw(0);
                     -- vely := sw(16) xor sw(1);
                     
-                    velx := '1';
-                    vely := '0';
+                    velx := 5;
+                    vely := -6;
                     
                     max_clk := (others => '1');
                     state := sb;
@@ -250,58 +257,58 @@ begin
                         --velx: '1';
                     else
                     
+
+                        -- if (velx < 0) then
+                        --     puckx := puckx - 1;
+                        -- else
+                        --     puckx := puckx + 1;
+                        -- end if;
+                        
+                        -- if (vely < 0) then
+                        --     pucky := pucky - 1;
+                        -- else
+                        --     pucky := pucky + 1;
+                        -- end if;
+                        
                         --Checks collision with TOP wall
                         if (pucky <= 6) then
-                            vely := '1';
+                            vely := -vely;
                         --Checks collision with BOTTOM wall
                         elsif (pucky >= 114) then
-                            vely := '0';
-                        end if;
-                        
-                        if (velx = '0') then
-                            puckx := puckx - 1;
-                        else
-                            puckx := puckx + 1;
-                        end if;
-                        if (vely = '0') then
-                            pucky := pucky - 1;
-                        else
-                            pucky := pucky + 1;
-                        end if;
-                        
-                        --collision detection with paddles
+                            vely := -vely;
+                        --Checks collision with paddles
                         --ONLY INVERTS X VELOCITY, NOT THE Y VELOCITY when hitting
-                        if (puckx = "00000101" and pucky >= t1g and pucky <= t1g+12) then
-                            velx := not velx;
-                            if (velx = '0') then
+                        elsif (puckx = "00000101" and pucky >= t1g and pucky <= t1g+12) then
+                            velx := -velx;
+                            -- if (velx < 0) then
                             
-                                --Why is it going by increments of '2' and not of '1'?
-                                puckx := puckx - 2;
-                            else
-                                puckx := puckx + 2;
-                            end if;
+                            --     --Why is it going by increments of '2' and not of '1'?
+                            --     puckx := puckx - 2;
+                            -- else
+                            --     puckx := puckx + 2;
+                            -- end if;
                         elsif (puckx = "01000011" and pucky >= t1f and pucky <= t1f+12) then
-                            velx := not velx;
-                            if (velx = '0') then
-                                puckx := puckx - 2;
-                            else
-                                puckx := puckx + 2;
-                            end if;
+                            velx := -velx;
+                            
                         elsif (puckx = "10011010" and pucky >= t2g and pucky <= t2g+12) then
-                            velx := not velx;
-                            if (velx = '0') then
-                                puckx := puckx - 2;
-                            else
-                                puckx := puckx + 2;
-                            end if;
+                            velx := -velx;
+                            
                         elsif (puckx = "01011101" and pucky >= t2f and pucky <= t2f+12) then
-                            velx := not velx;
-                            if (velx = '0') then
-                                puckx := puckx - 2;
-                            else
-                                puckx := puckx + 2;
-                            end if;
+                            velx := -velx;
+  
                         end if;
+                        
+                        error := to_signed( velx - vely, 6);
+                        e2 := signed(2*error)(6 downto 0);
+                        
+                        IF (e2 > -to_signed(abs(vely)) ) THEN
+              						error := error - to_signed(abs(vely));
+              						puckx := unsigned(signed(puckx) + to_signed(velx, 5));
+              					END IF;
+              					IF ( e2 < to_signed(abs(velx)) ) THEN
+              						error := error + to_signed(abs(velx));
+              						pucky := unsigned(signed(pucky) + to_signed(vely, 5));
+              					END IF;
                         
                         plot <= '1';
                         colour <= "111";
