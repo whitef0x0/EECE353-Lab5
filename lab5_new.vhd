@@ -81,7 +81,13 @@ begin
         variable vely : std_logic := '0';
     begin
         if (KEY(3) = '0') then
-            state := sr;
+            state := sgp1;
+            x_tmp := "00011010";
+            y_tmp := "0000101";
+            puckx := "00011010";
+            pucky := "0000110";
+            velx := sw(17) xor sw(0);
+            vely := sw(16) xor sw(1);
         elsif (rising_edge(CLOCK_50)) then
             case state is
                 when sr =>
@@ -281,7 +287,6 @@ begin
                         elsif (puckx = "01000011" and pucky >= t1f and pucky <= t1f+12) then
                             velx := not velx;
                             if (velx = '0') then
-                                puckx := puckx - 2;
                             else
                                 puckx := puckx + 2;
                             end if;
