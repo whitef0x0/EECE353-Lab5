@@ -18,7 +18,8 @@ entity lab5_new is
       -- VGA_VS               : out std_logic;
       -- VGA_BLANK            : out std_logic;
       -- VGA_SYNC             : out std_logic;
-      -- VGA_CLK              : out std_logic);
+      -- VGA_CLK              : out std_logic
+      );
 end lab5_new;
 
 architecture RTL of lab5_new is
@@ -92,11 +93,8 @@ begin
                     pucky := "0111100";
                     
                     --THIS ISN'T CORRECT WAY TO INITIALIZE OUR VELOCITY
-                    -- velx := sw(17) xor sw(0);
-                    -- vely := sw(16) xor sw(1);
-                    
-                    velx := '1';
-                    vely := '0';
+                    velx := sw(17) xor sw(0);
+                    vely := sw(16) xor sw(1);
                     
                     max_clk := (others => '1');
                     state := sb;
@@ -350,5 +348,6 @@ begin
     end process;
 
 end RTL;
+
 
 
