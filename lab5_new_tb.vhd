@@ -351,19 +351,32 @@ begin
     t2g := "0110110";
     t2f := "0110110";
     velx := p2_fwd xor p1_fwd;
-    velx := p2_goalie xor p1_goalie;
+    vely := p2_goalie xor p1_goalie;
     
     
         
 		--Press Reset
+		resetb <= '1';
+		wait until rising_edge(clk);
 		resetb <= '0';
 		wait until rising_edge(clk);
 		
 		--Clear Screen Initial State 
 		resetb <= '1';
-		clear_screen;
-		draw_walls;
-		draw_paddles;
+		--clear_screen;
+		--draw_walls;
+		--draw_paddles;
+
+  
+		--Press Reset
+		-- resetb <= '0';
+		-- wait until rising_edge(clk);
+		
+		-- --Clear Screen Initial State 
+		-- resetb <= '1';
+		-- clear_screen;
+		-- draw_walls;
+		-- draw_paddles;
 
   --wait until rising_edge(clk);
   --Test 1 | STEP #1
@@ -371,55 +384,69 @@ begin
 		
 		
 		-- PUCK will move on UPWARD-LEFT trajectory till (26, 6) 
-		for i in 0 to 53 loop
+		-- for i in 0 to 53 loop
 		
-			--Draw ball
-			assert plot_out = '1' report "plot not 1 CLRSCRN" severity failure;
-			--report "colour_out:"& integer'image( conv_integer(colour_out) ) &" x_out:"&integer'image( conv_integer(x_out) )& " y_out:"& integer'image( conv_integer(y_out) );
-      --report " i:"&integer'image( i );
-			assert colour_out = WALL_COLOUR report "colour_out not WALL_COLOUR (111)" severity failure;
-			puckx := puckx - 1;
-			pucky := pucky - 1;
+		-- 	--Draw ball
+		-- 	assert plot_out = '1' report "plot not 1 CLRSCRN" severity failure;
+		-- 	report "colour_out:"& integer'image( conv_integer(colour_out) ) &" x_out:"&integer'image( conv_integer(x_out) )& " y_out:"& integer'image( conv_integer(y_out) );
+  --    report " i:"&integer'image( i );
+		-- 	assert colour_out = WALL_COLOUR report "colour_out not WALL_COLOUR (111)" severity failure;
+		-- 	puckx := puckx - 1;
+		-- 	pucky := pucky - 1;
 			
-			assert x_out = std_logic_vector(puckx);
-			assert y_out = std_logic_vector(pucky);
+		-- 	assert x_out = std_logic_vector(puckx);
+		-- 	assert y_out = std_logic_vector(pucky);
 
-			wait until rising_edge(clk);
+		-- 	wait until rising_edge(clk);
 			
-			--Wait until paddle have been updated
-			assert plot_out = '0' report "plot!=1 " severity failure;
-			wait until plot_out = '1';
+		-- 	--Wait until paddle have been updated
+		-- 	assert plot_out = '0' report "plot!=1 " severity failure;
+		-- 	wait until plot_out = '1';
 			
-			--Wait until paddles have been fully drawn
-			for b in 0 to 441 loop
-				assert plot_out = '1' report "plot != 1 " severity failure;
-				wait until rising_edge(clk);
-			end loop;
+		-- 	--Wait until paddles have been fully drawn
+		-- 	for b in 0 to 441 loop
+		-- 		assert plot_out = '1' report "plot != 1 " severity failure;
+		-- 		wait until rising_edge(clk);
+		-- 	end loop;
 			
-		end loop;
+		-- end loop;
 		
-		
+		--Test 1 | STEP #2
 		-- PUCK hits TOP wall and bounces off DOWNWARD-LEFT  after (26, 6) 
-		assert y_out = "0000101" report "ynot != 5" severity failure; -- 5
-		assert x_out = "00011011" report "xnot != 25" severity failure; -- 25
-		puckx := puckx - 1;
-		pucky := pucky + 1;
+		--report "colour_out:"& integer'image( conv_integer(colour_out) ) &" x_out:"&integer'image( conv_integer(x_out) )& " y_out:"& integer'image( conv_integer(y_out) );
+    wait until rising_edge(clk);
+    --report "colour_out:"& integer'image( conv_integer(colour_out) ) &" x_out:"&integer'image( conv_integer(x_out) )& " y_out:"& integer'image( conv_integer(y_out) );
+    --wait until rising_edge(clk);
+		--assert y_out = "0000110" report "ynot != 6" severity failure; -- 6
+		--assert x_out = "00011010" report "xnot != 26" severity failure; -- 26
+		--pucky := pucky + 1;	
+		--puckx := puckx - 1;
+
 		vely := '1';
 		wait until rising_edge(clk);
+    wait until rising_edge(clk);
 		
 		-- PUCK will move on a DOWNWARD-LEFT trajectory till (4, 28) 
 		for i in 0 to 21 loop
+		  report "colour_out:"& integer'image( conv_integer(colour_out) ) &" x_out:"&integer'image( conv_integer(x_out) )& " y_out:"& integer'image( conv_integer(y_out) );
+      report "plot_out:"& std_logic'image( plot_out ); 
+		  
 			assert colour_out = WALL_COLOUR report "colour_out not WALL_COLOUR (111)" severity failure;
 			puckx := puckx - 1;
 			pucky := pucky + 1;
+			
+			assert plot_out = '1' report "plot != 1" severity failure;
 			wait until rising_edge(clk);
+			
+			report "colour_out:"& integer'image( conv_integer(colour_out) ) &" x_out:"&integer'image( conv_integer(x_out) )& " y_out:"& integer'image( conv_integer(y_out) );
+      report " i:"&integer'image( i );
 			
 			--Wait until paddle have been updated
 			assert plot_out = '0' report "plot != 0" severity failure;
 			wait until plot_out = '1';
 			
 			--Wait until paddles have been fully drawn
-			for b in 0 to 440 loop
+			for b in 0 to 441 loop
 				assert plot_out = '1' report "plot != 1" severity failure;
 				wait until rising_edge(clk);
 			end loop;
@@ -450,3 +477,4 @@ begin
 end process;
 
 end architecture;
+
